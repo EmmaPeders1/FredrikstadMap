@@ -5,6 +5,7 @@ import esriConfig from "@arcgis/core/config.js";
 import MapView from "@arcgis/core/views/MapView";
 import Map from "@arcgis/core/Map";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
+import WMSLayer from "@arcgis/core/layers/WMSLayer";
 import PopupTemplate from "@arcgis/core/PopupTemplate";
 
 import "../App.css";
@@ -15,7 +16,7 @@ const MapComponent = () => {
   const mapDiv = useRef(null);
   const context = useContext(AppContext);
 
-  // Opprett kartet
+  // Opprett karte
   useEffect(() => {
     if (mapDiv.current) {
       // Det første vi trenger er et Map objekt med bakgrunnskart
@@ -23,8 +24,26 @@ const MapComponent = () => {
       // En liste med valg finner vi i API dokumentasjonen:
       // https://developers.arcgis.com/javascript/latest/api-reference/esri-Map.html#basemap
       const map = new Map({
-        basemap: "",
+        basemap: "arcgis-navigation",
       });
+
+      // Hent dataen
+      const featureLayer = new FeatureLayer({
+        url: "https://services.arcgis.com/PdUYt91ohJfR04kk/arcgis/rest/services/Skjenkebevillinger/FeatureServer/0",
+        popupEnabled: true,
+        popupTemplate: {
+          title: "{SKJENKESTEDETS_NAVN}",
+          content: [{
+            type: "text",
+            text: `<p>Age limit: {ALKOHOLKLASSE}</p>`
+          }]
+        }
+      });
+      // Legg til dataen i kartet
+      map.add(featureLayer);
+
+      // Legg til dataen i context
+      context.featureLayer.set(featureLayer);
 
       // Vi ønsker så å hente data som vi kan legge til i kartet.
       // På følgende tjeneste finner dere punkter som viser en rekke turistatraksjoner i Europa:
@@ -59,7 +78,15 @@ const MapComponent = () => {
         // map
         // container
         // extent(valgfritt, men lurt å ha med)
-      }).when(() => {
+        map: map,
+        container: mapDiv.current,
+        extent: {
+          ymin: 59.20800679198961,
+          xmin: 10.938617437671552,
+          ymax: 59.21800679198961,
+          xmax: 10.948617437671552,
+        },
+      }).when((mapView) => {
         // Når kartet er initialisert kan vi manipulre dataen her
       });
     }

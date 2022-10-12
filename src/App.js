@@ -26,7 +26,10 @@ function App() {
 
   return (
     <AppContext.Provider value={store}>
-      <div style={{ height: "100%", width: "100%" }}>
+      <h1>Are you currently in Fredrikstad?</h1>
+      <h2>In that case, here are the places you can get a drink. </h2>
+      <h2>You need it. </h2>
+      <div style={{ height: "65%", width: "80%", margin: "2rem auto 0 auto" }}>
         <MapComponent />
         {/* <RouteWidget /> */}
       </div>
